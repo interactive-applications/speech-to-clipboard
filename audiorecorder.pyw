@@ -1,15 +1,15 @@
 import os
 import sys
 import configparser
+import openai
 import humanize
+import pyperclip
 import tkinter as tk
 import sounddevice as sd
 import soundfile as sf
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
-import openai
 from openai.openai_object import OpenAIObject
-import json
 
 WAV_FILE_PATH = "./audio/output.wav"
 OPENAI_API_KEY_ENV_VAR = "WHISPER_KEYBOARD_API_KEY"
@@ -180,7 +180,8 @@ class App:
                 transcript = self.transcriber.transcribe(self.wav_file)
                 # write to output
                 self.write_text_output(transcript)
-                self.print_status("Done")
+                pyperclip.copy(transcript)
+                self.print_status("Done. Copied to clipboard.")
             else:
                 self.print_status("Recording too short. Try again.")
 

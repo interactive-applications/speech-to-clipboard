@@ -4,3 +4,4 @@ soundfile
 numpy
 humanize
 pydub
+pyperclip
