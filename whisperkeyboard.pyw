@@ -116,6 +116,13 @@ class AudioRecorder:
         return length
 
 class App:
+    ready_color = "#b8e994"
+    recording_color = "#ff6961"
+    transcribing_color = "#FFA500"
+    record_text = "REC"
+    pad = 10
+    halfpad = pad // 2
+    
     def __init__(self, master, wav_file_path="./audio/output.wav", openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
         self.master = master
         self.master.title("Whisper Keyboard")
@@ -129,6 +136,8 @@ class App:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
         self.master.iconbitmap(icon_file)
         self.master.wm_iconbitmap(icon_file)
+        
+        self.master.minsize(width=500, height=300)
         
         self.wav_file = wav_file_path
         self.recorder = AudioRecorder(wav_file_path=self.wav_file)
@@ -144,30 +153,48 @@ class App:
         self.config.read('config.ini')
         self.device_var = tk.StringVar(master)
         self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
-        self.device_dropdown = tk.OptionMenu(master, self.device_var, *[device['name'] for device in self.recorder.devices])
-        self.device_dropdown.pack()
-        self.record_button = tk.Button(master, text="Record", command=self.toggle_recording)
-        self.record_button.pack()
-        self.status_output = tk.Label(master, text="")
-        self.status_output.pack()
+        
+        PAD = self.pad
+        HALF_PAD = self.halfpad
+        
+        row_frame = tk.Frame(master)
+        row_frame.pack(fill=tk.X, padx=PAD, pady=HALF_PAD)
+        
+        self.device_dropdown = tk.OptionMenu(row_frame, self.device_var, *[device['name'] for device in self.recorder.devices])
+        self.device_dropdown.pack(side=tk.LEFT)
+        self.status_output = tk.Label(row_frame, text="", anchor=tk.W, justify=tk.LEFT)
+        self.status_output.pack(side=tk.LEFT, fill=tk.X)
+        self.record_button = tk.Button(master, text=self.record_text, command=self.toggle_recording, bg=self.ready_color)
+        self.record_button.pack(fill=tk.X, padx=PAD, pady=HALF_PAD)
         self.text_output = tk.Text(master, height=10, width=50)
-        self.text_output.pack()
+        self.text_output.pack(fill=tk.BOTH, expand=True)
+        
+        self.status_output.config(font=self.text_output.cget("font"))
+        
         self.print_status("Ready")
     
     def print_status(self, text):
         print(text)
         self.status_output.config(text=text)
     
-    def write_text_output(self, text):
+    def clear_text_output(self):
         self.text_output.delete(1.0, tk.END)
+    
+    def write_text_output(self, text):
+        self.clear_text_output()
         self.text_output.insert(tk.END, text)
-        
+    
+    def refresh_ui(self):
+        self.master.update()
+    
     def toggle_recording(self):
         if not self.recorder.is_recording:
             device_index = [device['name'] for device in self.recorder.devices].index(self.device_var.get())
-            self.recorder.start_recording(device_index)
+            self.record_button.config(bg=self.recording_color)
             self.record_button.config(text="Stop")
             self.print_status("Recording...")
+            self.refresh_ui()
+            self.recorder.start_recording(device_index)
         else:
             self.print_status("Stopping recording...")
             self.recorder.stop_recording()
@@ -175,7 +202,10 @@ class App:
             self.recorder.delete_audio()
             self.print_status("Saving audio...")
             length = self.recorder.save_audio()
-            self.record_button.config(text="Record")
+            
+            self.record_button.config(text="...")
+            self.record_button.config(bg=self.transcribing_color)
+            
             length_str = humanize.precisedelta(length, format='%0.2f')
             self.print_status(f"Saved. Length: {length_str}")
             # save config file
@@ -185,9 +215,10 @@ class App:
             
             if length > 1:
                 # transcribe
-                self.print_status(f"Transcribing {length_str} audio...")
+                self.print_status(f"Transcribing {length_str}...")
+                self.clear_text_output()
                 # refresh ui
-                self.master.update()
+                self.refresh_ui()
                 # transribe
                 transcript = self.transcriber.transcribe(self.wav_file)
                 # write to output
@@ -196,6 +227,9 @@ class App:
                 self.print_status("Done. Copied to clipboard.")
             else:
                 self.print_status("Recording too short. Try again.")
+            
+            self.record_button.config(text=self.record_text)
+            self.record_button.config(bg=self.ready_color)
 
 root = tk.Tk()
 app = App(root, WAV_FILE_PATH, OPENAI_API_KEY_ENV_VAR)
