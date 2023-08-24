@@ -5,6 +5,7 @@ import openai
 import humanize
 import pyperclip
 import tkinter as tk
+from tkinter.font import Font
 import sounddevice as sd
 import soundfile as sf
 from pydub import AudioSegment
@@ -28,8 +29,6 @@ class Transcriber:
                 transcript : OpenAIObject = openai.Audio.transcribe("whisper-1", audio_file)
                 return transcript['text']
             except openai.error.InvalidRequestError as e:
-                return "Error: " + str(e)
-            except json.decoder.JSONDecodeError as e:
                 return "Error: " + str(e)
             except Exception as e:
                 return "Error: " + str(e)
@@ -126,7 +125,15 @@ class App:
     def __init__(self, master, wav_file_path="./audio/output.wav", openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
         self.master = master
         self.master.title("Whisper Keyboard")
-        icon_file = os.path.join(os.path.dirname(__file__), 'icon.ico')
+        
+        # font setup
+        
+        mono = Font(family=self.abs_path("./resources/IBMPlexMono-Regular.ttf"), size=10)
+        self.master.option_add("*Font", mono)
+        #sans = Font(family="./resources/IBMPlexSans-Regular", size=10)
+        #self.master.option_add("*Font", sans)
+        
+        icon_file = self.abs_path('./resources/icon.ico')
         
         # if windows
         if os.name == 'nt':
@@ -166,12 +173,15 @@ class App:
         self.status_output.pack(side=tk.LEFT, fill=tk.X)
         self.record_button = tk.Button(master, text=self.record_text, command=self.toggle_recording, bg=self.ready_color)
         self.record_button.pack(fill=tk.X, padx=PAD, pady=HALF_PAD)
-        self.text_output = tk.Text(master, height=10, width=50)
-        self.text_output.pack(fill=tk.BOTH, expand=True)
+        self.text_output = tk.Text(master, height=10, width=50, font=mono)
+        self.text_output.pack(fill=tk.BOTH, expand=True, padx=PAD, pady=PAD)
         
-        self.status_output.config(font=self.text_output.cget("font"))
+        self.status_output.config(font=mono)
         
         self.print_status("Ready")
+    
+    def abs_path(self, path):
+        return os.path.join(os.path.dirname(__file__), path)
     
     def print_status(self, text):
         print(text)
