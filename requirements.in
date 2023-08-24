@@ -1,0 +1,5 @@
+openai
+sounddevice
+soundfile
+numpy
+humanize
