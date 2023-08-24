@@ -18,6 +18,7 @@ class AudioRecorder:
         self.rate = 44100
         self.record_seconds = 5
         self.devices = self.get_devices()
+        self.stream = None
     
     def get_devices(self):
         devices = sd.query_devices()
@@ -35,10 +36,14 @@ class AudioRecorder:
         sd.default.dtype = 'int16'
         sd.default.blocksize = 1024
         sd.default.latency = 'low'
-        sd.InputStream(callback=self.callback).start()
+        self.stream = sd.InputStream(callback=self.callback)
+        self.stream.start()
 
     def stop_recording(self):
         self.is_recording = False
+        self.stream.stop()
+        self.stream.close()
+        self.stream = None
 
     def callback(self, indata, frames, time, status):
         if status:
