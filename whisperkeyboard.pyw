@@ -117,10 +117,22 @@ class AudioRecorder:
 
 class App:
     def __init__(self, master, wav_file_path="./audio/output.wav", openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
+        self.master = master
+        self.master.title("Whisper Keyboard")
+        icon_file = os.path.join(os.path.dirname(__file__), 'icon.ico')
+        
+        # if windows
+        if os.name == 'nt':
+            # the following lines make the icon work in the windows taskbar
+            import ctypes
+            myappid = u'com.chia.whisperkeyboard'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        self.master.iconbitmap(icon_file)
+        self.master.wm_iconbitmap(icon_file)
+        
         self.wav_file = wav_file_path
         self.recorder = AudioRecorder(wav_file_path=self.wav_file)
         self.transcriber = Transcriber(openai_api_key_env_var=openai_api_key_env_var)
-        self.master = master
         self.config = configparser.ConfigParser()
         
         # create config file if it does not exist
@@ -164,8 +176,8 @@ class App:
             self.print_status("Saving audio...")
             length = self.recorder.save_audio()
             self.record_button.config(text="Record")
-            #length = len(self.recorder.frames) / float(self.recorder.rate) * 1000
-            self.print_status(f"Saved. Length: {humanize.precisedelta(length, format='%0.2f')}")
+            length_str = humanize.precisedelta(length, format='%0.2f')
+            self.print_status(f"Saved. Length: {length_str}")
             # save config file
             self.config['audio'] = {'device': self.device_var.get()}
             with open('config.ini', 'w') as configfile:
@@ -173,7 +185,7 @@ class App:
             
             if length > 1:
                 # transcribe
-                self.print_status("Transcribing...")
+                self.print_status(f"Transcribing {length_str} audio...")
                 # refresh ui
                 self.master.update()
                 # transribe
