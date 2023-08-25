@@ -16,6 +16,18 @@ WAV_FILE_PATH = "./audio/output.wav"
 OPENAI_API_KEY_ENV_VAR = "WHISPER_KEYBOARD_API_KEY"
 
 
+class FramedLabel(ctk.CTkFrame):
+    
+    def __init__(self, master, text: str, justify=ctk.LEFT, **kwargs):
+        super().__init__(master, **kwargs)
+        
+        self.label = ctk.CTkLabel(self, text=text, justify=justify)
+        self.label.grid(row=0, column=0, padx=10)
+    
+    def configure(self, *args, **kwargs):
+        self.label.configure(*args, **kwargs)
+
+
 class Transcriber:
     
     def __init__(self, openai_api_key=""):
@@ -127,13 +139,12 @@ class App:
     transcribing_color = "#FFA500"
     record_text = "REC"
     pad = 10
-    halfpad = pad // 2
     
     config_file_path = "./resources/config.ini"
     
     def __init__(
         self,
-        master,
+        master: ctk.CTk,
         win_title="Whisper Clip",
         wav_file_path="./audio/output.wav",
         openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"
@@ -195,25 +206,51 @@ class App:
         self.transcriber = Transcriber(openai_api_key=openai_api_key)
         
         pad = self.pad
-        half_pad = self.halfpad
+        v_pad = (pad, 0)
+        row = 0
         
-        row_frame = ctk.CTkFrame(master)
-        row_frame.pack(fill=ctk.X, padx=pad, pady=half_pad)
+        master.columnconfigure(0, weight=0)
+        master.columnconfigure(1, weight=1)
+        
+        master.grid_rowconfigure(row, weight=0)
         
         self.device_dropdown = ctk.CTkOptionMenu(
-            row_frame, variable=self.device_var, values=available_devices
+            master, variable=self.device_var, values=available_devices
         )
-        self.device_dropdown.pack(side=ctk.LEFT)
-        self.status_output = ctk.CTkLabel(
-            row_frame, text="", anchor=ctk.W, justify=ctk.LEFT
+        self.device_dropdown.grid(row=row, column=0, padx=(pad, 0), pady=v_pad)
+        
+        self.status_output = FramedLabel(master, text="", justify=ctk.LEFT)
+        self.status_output.grid(
+            row=row, column=1, padx=pad, pady=v_pad, sticky=ctk.EW
         )
-        self.status_output.pack(side=ctk.LEFT, fill=ctk.X)
+        
+        row += 1
+        
         self.record_button = ctk.CTkButton(
             master, text=self.record_text, command=self.toggle_recording
         )
-        self.record_button.pack(fill=ctk.X, padx=pad, pady=half_pad)
-        self.text_output = ctk.CTkTextbox(master, height=10, width=50)
-        self.text_output.pack(fill=ctk.BOTH, expand=True, padx=pad, pady=pad)
+        self.record_button.grid(
+            row=row,
+            column=0,
+            columnspan=2,
+            sticky=ctk.EW,
+            padx=pad,
+            pady=v_pad,
+        )
+        
+        row += 1
+        
+        master.grid_rowconfigure(row, weight=1)
+        
+        self.text_output = ctk.CTkTextbox(master)
+        self.text_output.grid(
+            row=row,
+            column=0,
+            columnspan=2,
+            sticky=ctk.NSEW,
+            padx=pad,
+            pady=pad,
+        )
         
         self.print_status("Ready")
     
