@@ -10,6 +10,7 @@ import soundfile as sf
 from pydub import AudioSegment
 from pydub.silence import detect_leading_silence
 from openai.openai_object import OpenAIObject
+from utils.replacer import Replacer
 
 
 WAV_FILE_PATH = "./audio/output.wav"
@@ -147,6 +148,8 @@ class App:
     
     config_file_path = "./resources/config.ini"
     
+    raw_transcript = ""
+    
     def __init__(
         self,
         master: tk.CTk,
@@ -211,6 +214,8 @@ class App:
         
         self.transcriber = Transcriber(openai_api_key=openai_api_key)
         
+        self.replacer = Replacer()
+        
         pad = self.pad
         v_pad = (pad, 0)
         row = 0
@@ -240,6 +245,11 @@ class App:
         self.append = tk.CTkCheckBox(settings_frame, text="Append")
         self.append.grid(row=0, column=0, padx=pad, pady=pad, sticky=tk.W)
         
+        self.replace = tk.CTkCheckBox(
+            settings_frame, text="Replacement", command=self.on_replace_changed
+        )
+        self.replace.grid(row=0, column=1, padx=pad, pady=pad, sticky=tk.W)
+        
         row += 1
         
         self.record_button = tk.CTkButton(
@@ -258,7 +268,7 @@ class App:
         
         master.grid_rowconfigure(row, weight=1)
         
-        self.text_output = tk.CTkTextbox(master)
+        self.text_output = tk.CTkTextbox(master, wrap=tk.WORD)
         self.text_output.grid(
             row=row,
             column=0,
@@ -270,7 +280,6 @@ class App:
         
         self.print_status("Ready")
         self.ready_color = self.record_button.cget('fg_color')
-        #self.record_button.configure(fg_color=self.ready_color)
     
     def abs_path(self, path):
         return os.path.join(os.path.dirname(__file__), path)
@@ -294,6 +303,17 @@ class App:
     
     def refresh_ui(self):
         self.master.update()
+    
+    def on_replace_changed(self):
+        if self.replace.get():
+            self.write_text_output(self.replacer.replace(self.raw_transcript))
+        else:
+            self.write_text_output(self.raw_transcript)
+    
+    def copy_to_clipboard(self):
+        # wysiwyg - copy the current text
+        pyperclip.copy(self.get_text_output())
+        self.print_status("Done. Copied to clipboard.")
     
     def toggle_recording(self):
         if not self.recorder.is_recording:
@@ -333,12 +353,16 @@ class App:
                 # transribe
                 transcript = self.transcriber.transcribe(self.wav_file)
                 
-                # write to output
-                self.write_text_output(transcript, append=self.append.get())
+                if self.append.get():
+                    self.raw_transcript = self.raw_transcript + " " + transcript
+                else:
+                    self.raw_transcript = transcript
+                
+                # replace if enabled, and write to output
+                self.on_replace_changed()
                 
                 # copy to clipboard
-                pyperclip.copy(self.get_text_output())
-                self.print_status("Done. Copied to clipboard.")
+                self.copy_to_clipboard()
             else:
                 self.print_status("Recording too short or silence.")
             
