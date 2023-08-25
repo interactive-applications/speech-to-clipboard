@@ -31,7 +31,7 @@ class Transcriber:
                 return transcript['text']
             except openai.error.InvalidRequestError as e:
                 return "Error: " + str(e)
-            except Exception as e:
+            except Exception as e: #pylint: disable=broad-except
                 return "Error: " + str(e)
 
 
@@ -130,6 +130,8 @@ class App:
     pad = 10
     halfpad = pad // 2
     
+    config_file_path = "./resources/config.ini"
+    
     def __init__(
         self,
         master,
@@ -170,13 +172,14 @@ class App:
         self.recorder = AudioRecorder(wav_file_path=self.wav_file)
         
         # create config file if it does not exist
-        if not os.path.exists('config.ini'):
+        if not os.path.exists(self.config_file_path):
             self.config['audio'] = {'device': self.recorder.devices[0]['name']}
             self.config['openai'] = {'api_key': 'your-api-key-here'}
-            with open('config.ini', 'w', encoding='utf-8') as configfile:
+            with open(self.config_file_path, 'w',
+                        encoding='utf-8') as configfile:
                 self.config.write(configfile)
         
-        self.config.read('config.ini')
+        self.config.read(self.config_file_path, encoding='utf-8')
         self.device_var = tk.StringVar(master)
         #self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
         selected_device = self.config.get(
@@ -270,7 +273,8 @@ class App:
             self.print_status(f"Saved. Length: {length_str}")
             # save config file
             self.config['audio'] = {'device': self.device_var.get()}
-            with open('config.ini', 'w', encoding='utf-8') as configfile:
+            with open(self.config_file_path, 'w',
+                        encoding='utf-8') as configfile:
                 self.config.write(configfile)
             
             if length > 1:
