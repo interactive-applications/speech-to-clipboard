@@ -72,6 +72,10 @@
   {
    "optionDest": "datas",
    "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/resources;resources/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/.venv/Lib/site-packages/customtkinter;customtkinter/"
   }
  ],
  "nonPyinstallerOptions": {
