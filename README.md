@@ -26,6 +26,6 @@ Simple UI tool for recording from the microphone and transferring the audio to *
 # AutoPyToExe
 
 1. Install dev requirements with `pip install -r requirements-dev.in`
-1. Run `auto-py-to-exe`
+1. Run `auto-py-to-exe -c auto-py-to-exe-config.json`
 1. Load the configuration file `auto-py-to-exe-config.json` (**Settings** → **Configuration** → **Import Config From JSON File**)
 1. Click **Convert .py to .exe**
