@@ -1,1 +1,3 @@
 auto-py-to-exe
+yapf
+pylint
