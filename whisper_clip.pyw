@@ -18,10 +18,8 @@ OPENAI_API_KEY_ENV_VAR = "WHISPER_KEYBOARD_API_KEY"
 
 
 class Transcriber:
-    def __init__(self, openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
-        API_KEY = os.getenv(openai_api_key_env_var)
-        # #print(API_KEY[-5:])
-        openai.api_key = API_KEY
+    def __init__(self, openai_api_key=""):
+        openai.api_key = openai_api_key
     
     def transcribe(self, wav_file_path="./audio/output.wav"):
         with open(wav_file_path, "rb") as audio_file:
@@ -145,20 +143,36 @@ class App:
         
         self.master.minsize(width=500, height=300)
         
+        self.config = configparser.ConfigParser()
+        
         self.wav_file = wav_file_path
         self.recorder = AudioRecorder(wav_file_path=self.wav_file)
-        self.transcriber = Transcriber(openai_api_key_env_var=openai_api_key_env_var)
-        self.config = configparser.ConfigParser()
         
         # create config file if it does not exist
         if not os.path.exists('config.ini'):
             self.config['audio'] = {'device': self.recorder.devices[0]['name']}
-            with open('config.ini', 'w') as configfile:
+            self.config['openai'] = {'api_key': 'your-api-key-here'}
+            with open('config.ini', 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
         
         self.config.read('config.ini')
         self.device_var = tk.StringVar(master)
-        self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
+        #self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
+        selected_device = self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name'])
+        available_devices = [device['name'] for device in self.recorder.devices]
+        print("Devices:" + "\n".join(available_devices))
+        if selected_device in available_devices:
+            self.device_var.set(selected_device)
+        else:
+            try:
+                self.device_var.set(self.recorder.devices[0]['name'])
+            except IndexError:
+                self.device_var.set("No devices found")
+        
+        openai_api_key = os.getenv(openai_api_key_env_var) or self.config.get('openai', 'api_key', fallback='no-api-key-found-in-config')
+        print(f"Using OpenAI API Key: {openai_api_key[:3]}...{openai_api_key[-4:]}")
+        
+        self.transcriber = Transcriber(openai_api_key=openai_api_key)
         
         PAD = self.pad
         HALF_PAD = self.halfpad
@@ -166,7 +180,7 @@ class App:
         row_frame = tk.Frame(master)
         row_frame.pack(fill=tk.X, padx=PAD, pady=HALF_PAD)
         
-        self.device_dropdown = tk.OptionMenu(row_frame, self.device_var, *[device['name'] for device in self.recorder.devices])
+        self.device_dropdown = tk.OptionMenu(row_frame, self.device_var, *available_devices)
         self.device_dropdown.pack(side=tk.LEFT)
         self.status_output = tk.Label(row_frame, text="", anchor=tk.W, justify=tk.LEFT)
         self.status_output.pack(side=tk.LEFT, fill=tk.X)
@@ -219,7 +233,7 @@ class App:
             self.print_status(f"Saved. Length: {length_str}")
             # save config file
             self.config['audio'] = {'device': self.device_var.get()}
-            with open('config.ini', 'w') as configfile:
+            with open('config.ini', 'w', encoding='utf-8') as configfile:
                 self.config.write(configfile)
             
             if length > 1:
