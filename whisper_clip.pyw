@@ -1,8 +1,7 @@
 import os
 import sys
 import configparser
-import tkinter as tk
-from tkinter.font import Font
+import customtkinter as ctk
 import openai
 import humanize
 import pyperclip
@@ -142,15 +141,6 @@ class App:
         self.master = master
         self.master.title(win_title)
         
-        # font setup
-        mono = Font(
-            family=self.abs_path("./resources/IBMPlexMono-Regular.ttf"),
-            size=10
-        )
-        self.master.option_add("*Font", mono)
-        #sans = Font(family="./resources/IBMPlexSans-Regular", size=10)
-        #self.master.option_add("*Font", sans)
-        
         icon_file = self.abs_path('./resources/icon.ico')
         
         # if windows
@@ -180,13 +170,13 @@ class App:
                 self.config.write(configfile)
         
         self.config.read(self.config_file_path, encoding='utf-8')
-        self.device_var = tk.StringVar(master)
+        self.device_var = ctk.StringVar(master)
         #self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
         selected_device = self.config.get(
             'audio', 'device', fallback=self.recorder.devices[0]['name']
         )
         available_devices = [device['name'] for device in self.recorder.devices]
-        print("Devices:" + "\n".join(available_devices))
+        print("Devices:\n - " + "\n - ".join(available_devices))
         if selected_device in available_devices:
             self.device_var.set(selected_device)
         else:
@@ -207,28 +197,23 @@ class App:
         pad = self.pad
         half_pad = self.halfpad
         
-        row_frame = tk.Frame(master)
-        row_frame.pack(fill=tk.X, padx=pad, pady=half_pad)
+        row_frame = ctk.CTkFrame(master)
+        row_frame.pack(fill=ctk.X, padx=pad, pady=half_pad)
         
-        self.device_dropdown = tk.OptionMenu(
-            row_frame, self.device_var, *available_devices
+        self.device_dropdown = ctk.CTkOptionMenu(
+            row_frame, variable=self.device_var, values=available_devices
         )
-        self.device_dropdown.pack(side=tk.LEFT)
-        self.status_output = tk.Label(
-            row_frame, text="", anchor=tk.W, justify=tk.LEFT
+        self.device_dropdown.pack(side=ctk.LEFT)
+        self.status_output = ctk.CTkLabel(
+            row_frame, text="", anchor=ctk.W, justify=ctk.LEFT
         )
-        self.status_output.pack(side=tk.LEFT, fill=tk.X)
-        self.record_button = tk.Button(
-            master,
-            text=self.record_text,
-            command=self.toggle_recording,
-            bg=self.ready_color
+        self.status_output.pack(side=ctk.LEFT, fill=ctk.X)
+        self.record_button = ctk.CTkButton(
+            master, text=self.record_text, command=self.toggle_recording
         )
-        self.record_button.pack(fill=tk.X, padx=pad, pady=half_pad)
-        self.text_output = tk.Text(master, height=10, width=50, font=mono)
-        self.text_output.pack(fill=tk.BOTH, expand=True, padx=pad, pady=pad)
-        
-        self.status_output.config(font=mono)
+        self.record_button.pack(fill=ctk.X, padx=pad, pady=half_pad)
+        self.text_output = ctk.CTkTextbox(master, height=10, width=50)
+        self.text_output.pack(fill=ctk.BOTH, expand=True, padx=pad, pady=pad)
         
         self.print_status("Ready")
     
@@ -237,14 +222,14 @@ class App:
     
     def print_status(self, text):
         print(text)
-        self.status_output.config(text=text)
+        self.status_output.configure(text=text)
     
     def clear_text_output(self):
-        self.text_output.delete(1.0, tk.END)
+        self.text_output.delete(1.0, ctk.END)
     
     def write_text_output(self, text):
         self.clear_text_output()
-        self.text_output.insert(tk.END, text)
+        self.text_output.insert(ctk.END, text)
     
     def refresh_ui(self):
         self.master.update()
@@ -253,8 +238,8 @@ class App:
         if not self.recorder.is_recording:
             device_index = [device['name'] for device in self.recorder.devices
                            ].index(self.device_var.get())
-            self.record_button.config(bg=self.recording_color)
-            self.record_button.config(text="Stop")
+            #self.record_button.configure(bg=self.recording_color)
+            self.record_button.configure(text="Stop")
             self.print_status("Recording...")
             self.refresh_ui()
             self.recorder.start_recording(device_index)
@@ -266,8 +251,8 @@ class App:
             self.print_status("Saving audio...")
             length = self.recorder.save_audio()
             
-            self.record_button.config(text="...")
-            self.record_button.config(bg=self.transcribing_color)
+            self.record_button.configure(text="...")
+            #self.record_button.configure(bg=self.transcribing_color)
             
             length_str = humanize.precisedelta(length, format='%0.2f')
             self.print_status(f"Saved. Length: {length_str}")
@@ -292,11 +277,11 @@ class App:
             else:
                 self.print_status("Recording too short or silence.")
             
-            self.record_button.config(text=self.record_text)
-            self.record_button.config(bg=self.ready_color)
+            self.record_button.configure(text=self.record_text)
+            #self.record_button.configure(bg=self.ready_color)
 
 
-root = tk.Tk()
+root = ctk.CTk()
 app = App(
     root,
     win_title="Whisper Clip",
