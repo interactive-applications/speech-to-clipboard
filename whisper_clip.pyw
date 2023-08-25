@@ -1,7 +1,7 @@
 import os
 import sys
 import configparser
-import customtkinter as ctk
+import customtkinter as tk
 import openai
 import humanize
 import pyperclip
@@ -16,12 +16,12 @@ WAV_FILE_PATH = "./audio/output.wav"
 OPENAI_API_KEY_ENV_VAR = "WHISPER_KEYBOARD_API_KEY"
 
 
-class FramedLabel(ctk.CTkFrame):
+class FramedLabel(tk.CTkFrame):
     
-    def __init__(self, master, text: str, justify=ctk.LEFT, **kwargs):
+    def __init__(self, master, text: str, justify=tk.LEFT, **kwargs):
         super().__init__(master, **kwargs)
         
-        self.label = ctk.CTkLabel(self, text=text, justify=justify)
+        self.label = tk.CTkLabel(self, text=text, justify=justify)
         self.label.grid(row=0, column=0, padx=10)
     
     def configure(self, *args, **kwargs):
@@ -82,6 +82,11 @@ class AudioRecorder:
             device for device in devices if device['max_input_channels'] > 0
         ]
         return devices
+    
+    def get_device_name(self, device_index):
+        if device_index >= len(self.devices) or device_index < 0:
+            return f"invalid device index: {device_index}"
+        return self.devices[device_index]['name']
     
     def start_recording(self, device_index):
         self.device_index = device_index
@@ -144,7 +149,7 @@ class App:
     
     def __init__(
         self,
-        master: ctk.CTk,
+        master: tk.CTk,
         win_title="Whisper Clip",
         wav_file_path="./audio/output.wav",
         openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"
@@ -165,7 +170,7 @@ class App:
         self.master.iconbitmap(icon_file)
         self.master.wm_iconbitmap(icon_file)
         
-        self.master.minsize(width=500, height=300)
+        self.master.minsize(width=500, height=200)
         
         self.config = configparser.ConfigParser()
         
@@ -174,25 +179,26 @@ class App:
         
         # create config file if it does not exist
         if not os.path.exists(self.config_file_path):
-            self.config['audio'] = {'device': self.recorder.devices[0]['name']}
+            self.config['audio'] = {'device': self.recorder.get_device_name(0)}
             self.config['openai'] = {'api_key': 'your-api-key-here'}
             with open(self.config_file_path, 'w',
                         encoding='utf-8') as configfile:
                 self.config.write(configfile)
         
         self.config.read(self.config_file_path, encoding='utf-8')
-        self.device_var = ctk.StringVar(master)
-        #self.device_var.set(self.config.get('audio', 'device', fallback=self.recorder.devices[0]['name']))
+        self.device_var = tk.StringVar(master)
         selected_device = self.config.get(
-            'audio', 'device', fallback=self.recorder.devices[0]['name']
+            'audio', 'device', fallback=self.recorder.get_device_name(0)
         )
+        
         available_devices = [device['name'] for device in self.recorder.devices]
         print("Devices:\n - " + "\n - ".join(available_devices))
+        
         if selected_device in available_devices:
             self.device_var.set(selected_device)
         else:
             try:
-                self.device_var.set(self.recorder.devices[0]['name'])
+                self.device_var.set(self.recorder.get_device_name(0))
             except IndexError:
                 self.device_var.set("No devices found")
         
@@ -214,26 +220,36 @@ class App:
         
         master.grid_rowconfigure(row, weight=0)
         
-        self.device_dropdown = ctk.CTkOptionMenu(
+        self.device_dropdown = tk.CTkOptionMenu(
             master, variable=self.device_var, values=available_devices
         )
         self.device_dropdown.grid(row=row, column=0, padx=(pad, 0), pady=v_pad)
         
-        self.status_output = FramedLabel(master, text="", justify=ctk.LEFT)
+        self.status_output = FramedLabel(master, text="", justify=tk.LEFT)
         self.status_output.grid(
-            row=row, column=1, padx=pad, pady=v_pad, sticky=ctk.EW
+            row=row, column=1, padx=pad, pady=v_pad, sticky=tk.EW
         )
         
         row += 1
         
-        self.record_button = ctk.CTkButton(
+        settings_frame = tk.CTkFrame(master)
+        settings_frame.grid(
+            row=row, column=0, columnspan=2, sticky=tk.EW, padx=pad, pady=v_pad
+        )
+        
+        self.append = tk.CTkCheckBox(settings_frame, text="Append")
+        self.append.grid(row=0, column=0, padx=pad, pady=pad, sticky=tk.W)
+        
+        row += 1
+        
+        self.record_button = tk.CTkButton(
             master, text=self.record_text, command=self.toggle_recording
         )
         self.record_button.grid(
             row=row,
             column=0,
             columnspan=2,
-            sticky=ctk.EW,
+            sticky=tk.EW,
             padx=pad,
             pady=v_pad,
         )
@@ -242,17 +258,19 @@ class App:
         
         master.grid_rowconfigure(row, weight=1)
         
-        self.text_output = ctk.CTkTextbox(master)
+        self.text_output = tk.CTkTextbox(master)
         self.text_output.grid(
             row=row,
             column=0,
             columnspan=2,
-            sticky=ctk.NSEW,
+            sticky=tk.NSEW,
             padx=pad,
             pady=pad,
         )
         
         self.print_status("Ready")
+        self.ready_color = self.record_button.cget('fg_color')
+        #self.record_button.configure(fg_color=self.ready_color)
     
     def abs_path(self, path):
         return os.path.join(os.path.dirname(__file__), path)
@@ -262,11 +280,17 @@ class App:
         self.status_output.configure(text=text)
     
     def clear_text_output(self):
-        self.text_output.delete(1.0, ctk.END)
+        self.text_output.delete(1.0, tk.END)
     
-    def write_text_output(self, text):
-        self.clear_text_output()
-        self.text_output.insert(ctk.END, text)
+    def write_text_output(self, text: str, append: bool = False):
+        if not append:
+            self.clear_text_output()
+        else:
+            self.text_output.insert(tk.END, " ")
+        self.text_output.insert(tk.END, text)
+    
+    def get_text_output(self):
+        return self.text_output.get(1.0, tk.END)
     
     def refresh_ui(self):
         self.master.update()
@@ -275,7 +299,7 @@ class App:
         if not self.recorder.is_recording:
             device_index = [device['name'] for device in self.recorder.devices
                            ].index(self.device_var.get())
-            #self.record_button.configure(bg=self.recording_color)
+            self.record_button.configure(fg_color=self.recording_color)
             self.record_button.configure(text="Stop")
             self.print_status("Recording...")
             self.refresh_ui()
@@ -289,7 +313,7 @@ class App:
             length = self.recorder.save_audio()
             
             self.record_button.configure(text="...")
-            #self.record_button.configure(bg=self.transcribing_color)
+            self.record_button.configure(fg_color=self.transcribing_color)
             
             length_str = humanize.precisedelta(length, format='%0.2f')
             self.print_status(f"Saved. Length: {length_str}")
@@ -302,23 +326,27 @@ class App:
             if length > 1:
                 # transcribe
                 self.print_status(f"Transcribing {length_str}...")
-                self.clear_text_output()
+                
                 # refresh ui
                 self.refresh_ui()
+                
                 # transribe
                 transcript = self.transcriber.transcribe(self.wav_file)
+                
                 # write to output
-                self.write_text_output(transcript)
-                pyperclip.copy(transcript)
+                self.write_text_output(transcript, append=self.append.get())
+                
+                # copy to clipboard
+                pyperclip.copy(self.get_text_output())
                 self.print_status("Done. Copied to clipboard.")
             else:
                 self.print_status("Recording too short or silence.")
             
             self.record_button.configure(text=self.record_text)
-            #self.record_button.configure(bg=self.ready_color)
+            self.record_button.configure(fg_color=self.ready_color)
 
 
-root = ctk.CTk()
+root = tk.CTk()
 app = App(
     root,
     win_title="Whisper Clip",
