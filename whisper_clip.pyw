@@ -122,12 +122,11 @@ class App:
     pad = 10
     halfpad = pad // 2
     
-    def __init__(self, master, wav_file_path="./audio/output.wav", openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
+    def __init__(self, master, win_title="Whisper Clip", wav_file_path="./audio/output.wav", openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"):
         self.master = master
-        self.master.title("Whisper Keyboard")
+        self.master.title(win_title)
         
         # font setup
-        
         mono = Font(family=self.abs_path("./resources/IBMPlexMono-Regular.ttf"), size=10)
         self.master.option_add("*Font", mono)
         #sans = Font(family="./resources/IBMPlexSans-Regular", size=10)
@@ -236,11 +235,11 @@ class App:
                 pyperclip.copy(transcript)
                 self.print_status("Done. Copied to clipboard.")
             else:
-                self.print_status("Recording too short. Try again.")
+                self.print_status("Recording too short or silence.")
             
             self.record_button.config(text=self.record_text)
             self.record_button.config(bg=self.ready_color)
 
 root = tk.Tk()
-app = App(root, WAV_FILE_PATH, OPENAI_API_KEY_ENV_VAR)
+app = App(root, win_title="Whisper Clip", wav_file_path=WAV_FILE_PATH, openai_api_key_env_var=OPENAI_API_KEY_ENV_VAR)
 root.mainloop()
