@@ -29,3 +29,16 @@ Simple UI tool for recording from the microphone and transferring the audio to *
 1. Run `auto-py-to-exe -c auto-py-to-exe-config.json`
 1. Load the configuration file `auto-py-to-exe-config.json` (**Settings** → **Configuration** → **Import Config From JSON File**)
 1. Click **Convert .py to .exe**
+
+# Replacer
+
+A simple naive text replacement system is implemented, which, if enabled using the **Replacer** checkbox, replaces certain expressions, e.g:
+
+| Expression | Replacement |
+|--|--|
+| `new line` | `\n` |
+| `bullet point` | `• ` |
+| `en dash` | `–` |
+| … | … |
+
+The replacements are defined (and can be configured/edited) in the [resources/replacements.json](resources/replacements.json) file, which should be rather self-explanatory.

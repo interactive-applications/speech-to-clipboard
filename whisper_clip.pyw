@@ -1,6 +1,8 @@
 import os
 import sys
 import configparser
+from tkinter import Event
+from typing import Callable
 import customtkinter as tk
 import openai
 import humanize
@@ -14,27 +16,16 @@ from utils.replacer import Replacer
 
 
 WAV_FILE_PATH = "./audio/output.wav"
+REPLACEMENTS_FILE_PATH = "./resources/replacements.json"
 OPENAI_API_KEY_ENV_VAR = "WHISPER_KEYBOARD_API_KEY"
-
-
-class FramedLabel(tk.CTkFrame):
-    
-    def __init__(self, master, text: str, justify=tk.LEFT, **kwargs):
-        super().__init__(master, **kwargs)
-        
-        self.label = tk.CTkLabel(self, text=text, justify=justify)
-        self.label.grid(row=0, column=0, padx=10)
-    
-    def configure(self, *args, **kwargs):
-        self.label.configure(*args, **kwargs)
 
 
 class Transcriber:
     
-    def __init__(self, openai_api_key=""):
+    def __init__(self, openai_api_key: str = "") -> None:
         openai.api_key = openai_api_key
     
-    def transcribe(self, wav_file_path="./audio/output.wav"):
+    def transcribe(self, wav_file_path: str = "./audio/output.wav") -> str:
         with open(wav_file_path, "rb") as audio_file:
             try:
                 transcript: OpenAIObject = openai.Audio.transcribe(
@@ -47,9 +38,103 @@ class Transcriber:
                 return "Error: " + str(e)
 
 
+class FramedLabel(tk.CTkFrame):
+    
+    def __init__(self, master, text: str, justify=tk.LEFT, **kwargs) -> None:
+        super().__init__(master, **kwargs)
+        
+        self.label = tk.CTkLabel(self, text=text, justify=justify)
+        self.label.grid(row=0, column=0, padx=10)
+    
+    def configure(self, *args, **kwargs) -> None:
+        self.label.configure(*args, **kwargs)
+    
+    def cget(self, *args, **kwargs) -> None:
+        try:
+            return self.label.cget(*args, **kwargs)
+        except AttributeError:
+            return super().cget(*args, **kwargs)
+
+
+class CachedText(tk.CTkTextbox):
+    
+    def __init__(self, *args, **kwargs) -> None:
+        """A Text widget that caches the text and only calls the modified event when the text is changed."""
+        self.text_cache = ""
+        super().__init__(*args, **kwargs)
+        self.on_changed_callbacks = []
+        self.bind("<<Modified>>", self._on_text_changed)
+    
+    def add_on_changed_callback(
+        self, func: Callable[[Event, str], None]
+    ) -> None:
+        self.on_changed_callbacks.append(func)
+    
+    def remove_on_changed_callback(
+        self, func: Callable[[Event, str], None]
+    ) -> None:
+        self.on_changed_callbacks.remove(func)
+    
+    def _on_text_changed(self, event: Event) -> None:
+        """
+        NOTE: this is called twice when the text is changed. 
+        This is not handled. Be aware of this.
+        At the end of this function, the modified flag must be reset.
+        Otherwise, the event will not be called again.
+        """
+        curr_text = self.get_text()
+        
+        if curr_text != self.text_cache:
+            # does not seem to work
+            self.event_generate("<<TextChanged>>")
+            # thus, call our probprietary subscribers' functions
+            for subscriber in self.on_changed_callbacks:
+                try:
+                    subscriber(event, curr_text)
+                except Exception: #pylint: disable=broad-except
+                    pass
+        
+        self.text_cache = curr_text
+        # reset the modified flag
+        # if this is not done, the modified event will not be called again
+        event.widget.edit_modified(False)
+    
+    def get_text(self) -> str:
+        txt = self.get(1.0, tk.END)
+        # remove the last newline, which tkinter seems to add automatically
+        if txt.endswith("\n"):
+            txt = txt[:-1]
+        return txt
+    
+    def get_text_from_cache(self) -> str:
+        return self.text_cache
+    
+    def insert(self, *args, **kwargs) -> str:
+        super().insert(*args, **kwargs)
+        self.text_cache = self.get_text()
+        return self.text_cache
+    
+    def clear(self) -> None:
+        super().delete(1.0, tk.END)
+        self.text_cache = self.get_text()
+    
+    def set_text(self, text) -> str:
+        self.clear()
+        self.insert(tk.END, text)
+        self.text_cache = self.get_text()
+        return self.text_cache
+    
+    def append_text(self, text, add_space=True) -> str:
+        if add_space:
+            self.insert(tk.END, " ")
+        self.insert(tk.END, text)
+        self.text_cache = self.get_text()
+        return self.text_cache
+
+
 class AudioRecorder:
     
-    def __init__(self, wav_file_path="./audio/output.wav"):
+    def __init__(self, wav_file_path: str = "./audio/output.wav") -> None:
         self.frames = []
         self.is_recording = False
         self.device_index = None
@@ -61,22 +146,22 @@ class AudioRecorder:
         self.wav_file = wav_file_path
     
     @staticmethod
-    def trim_leading_silence(audio_file):
+    def trim_leading_silence(audio_file) -> AudioSegment:
         return audio_file[detect_leading_silence(audio_file):]
     
     @staticmethod
-    def trim_trailing_silence(audio_file):
+    def trim_trailing_silence(audio_file) -> AudioSegment:
         return AudioRecorder.trim_leading_silence(audio_file.reverse()
                                                  ).reverse()
     
     @staticmethod
-    def strip_silence(audio_file):
+    def strip_silence(audio_file) -> AudioSegment:
         # from: https://stackoverflow.com/a/69331596
         return AudioRecorder.trim_trailing_silence(
             AudioRecorder.trim_leading_silence(audio_file)
         )
     
-    def get_devices(self):
+    def get_devices(self) -> list[str]:
         devices = sd.query_devices()
         # filter out devices that do not support recording
         devices = [
@@ -84,12 +169,12 @@ class AudioRecorder:
         ]
         return devices
     
-    def get_device_name(self, device_index):
+    def get_device_name(self, device_index: int) -> str:
         if device_index >= len(self.devices) or device_index < 0:
             return f"invalid device index: {device_index}"
         return self.devices[device_index]['name']
     
-    def start_recording(self, device_index):
+    def start_recording(self, device_index: int) -> None:
         self.device_index = device_index
         self.is_recording = True
         self.frames = []
@@ -102,7 +187,7 @@ class AudioRecorder:
         self.stream = sd.InputStream(callback=self.callback)
         self.stream.start()
     
-    def stop_recording(self):
+    def stop_recording(self) -> None:
         self.is_recording = False
         self.stream.stop()
         self.stream.close()
@@ -113,7 +198,7 @@ class AudioRecorder:
             print(status, file=sys.stderr)
         self.frames.append(indata.copy())
     
-    def delete_audio(self):
+    def delete_audio(self) -> None:
         if os.path.exists(self.wav_file):
             os.remove(self.wav_file)
     
@@ -149,14 +234,15 @@ class App:
     config_file_path = "./resources/config.ini"
     
     raw_transcript = ""
+    disable_replace_warning = "Disable 'Replacement' to edit text."
     
     def __init__(
         self,
         master: tk.CTk,
-        win_title="Whisper Clip",
-        wav_file_path="./audio/output.wav",
-        openai_api_key_env_var="WHISPER_KEYBOARD_API_KEY"
-    ):
+        win_title: str = "Whisper Clip",
+        wav_file_path: str = "./audio/output.wav",
+        openai_api_key_env_var: str = "WHISPER_KEYBOARD_API_KEY"
+    ) -> None:
         self.master = master
         self.master.title(win_title)
         
@@ -214,8 +300,6 @@ class App:
         
         self.transcriber = Transcriber(openai_api_key=openai_api_key)
         
-        self.replacer = Replacer()
-        
         pad = self.pad
         v_pad = (pad, 0)
         row = 0
@@ -246,9 +330,12 @@ class App:
         self.append.grid(row=0, column=0, padx=pad, pady=pad, sticky=tk.W)
         
         self.replace = tk.CTkCheckBox(
-            settings_frame, text="Replacement", command=self.on_replace_changed
+            settings_frame,
+            text="Replacement",
+            command=lambda: self.on_replace_changed(copy_to_clipboard=True)
         )
         self.replace.grid(row=0, column=1, padx=pad, pady=pad, sticky=tk.W)
+        self.replace.select()
         
         row += 1
         
@@ -268,7 +355,7 @@ class App:
         
         master.grid_rowconfigure(row, weight=1)
         
-        self.text_output = tk.CTkTextbox(master, wrap=tk.WORD)
+        self.text_output = CachedText(master, wrap=tk.WORD)
         self.text_output.grid(
             row=row,
             column=0,
@@ -277,45 +364,64 @@ class App:
             padx=pad,
             pady=pad,
         )
+        self.text_output.add_on_changed_callback(self.on_text_changed)
         
         self.print_status("Ready")
         self.ready_color = self.record_button.cget('fg_color')
+        
+        # add replacer
+        try:
+            self.replacer = Replacer(REPLACEMENTS_FILE_PATH)
+        except Exception as e: #pylint: disable=broad-except
+            self.print_status("Error loading Replacer.")
+            self.text_output.set_text(str(e))
     
-    def abs_path(self, path):
+    def on_text_changed(self, event: Event, text: str) -> None: #pylint: disable=unused-argument
+        if not self.replace.get():
+            self.raw_transcript = text
+            if self.get_status() == self.disable_replace_warning:
+                self.print_status("Ready")
+        else:
+            if self.get_status() != self.disable_replace_warning:
+                self.print_status(self.disable_replace_warning)
+    
+    def abs_path(self, path: str) -> str:
         return os.path.join(os.path.dirname(__file__), path)
     
-    def print_status(self, text):
+    def print_status(self, text: str) -> None:
         print(text)
         self.status_output.configure(text=text)
     
-    def clear_text_output(self):
-        self.text_output.delete(1.0, tk.END)
+    def get_status(self) -> str:
+        return self.status_output.cget('text')
     
-    def write_text_output(self, text: str, append: bool = False):
+    def write_text_output(self, text: str, append: bool = False) -> None:
         if not append:
-            self.clear_text_output()
+            self.text_output.set_text(text)
         else:
-            self.text_output.insert(tk.END, " ")
-        self.text_output.insert(tk.END, text)
+            self.text_output.append_text(text, add_space=True)
     
-    def get_text_output(self):
-        return self.text_output.get(1.0, tk.END)
+    def get_text_output(self) -> str:
+        return self.text_output.get_text()
     
-    def refresh_ui(self):
+    def refresh_ui(self) -> None:
         self.master.update()
     
-    def on_replace_changed(self):
+    def on_replace_changed(self, copy_to_clipboard: True) -> None:
         if self.replace.get():
             self.write_text_output(self.replacer.replace(self.raw_transcript))
         else:
             self.write_text_output(self.raw_transcript)
+        
+        if copy_to_clipboard:
+            self.copy_to_clipboard()
     
-    def copy_to_clipboard(self):
+    def copy_to_clipboard(self) -> None:
         # wysiwyg - copy the current text
         pyperclip.copy(self.get_text_output())
         self.print_status("Done. Copied to clipboard.")
     
-    def toggle_recording(self):
+    def toggle_recording(self) -> None:
         if not self.recorder.is_recording:
             device_index = [device['name'] for device in self.recorder.devices
                            ].index(self.device_var.get())
@@ -351,7 +457,12 @@ class App:
                 self.refresh_ui()
                 
                 # transribe
-                transcript = self.transcriber.transcribe(self.wav_file)
+                try:
+                    transcript = self.transcriber.transcribe(self.wav_file)
+                except Exception as e: #pylint: disable=broad-except
+                    self.print_status("Error transcribing.")
+                    self.text_output.set_text(str(e))
+                    return
                 
                 if self.append.get():
                     self.raw_transcript = self.raw_transcript + " " + transcript
@@ -359,7 +470,7 @@ class App:
                     self.raw_transcript = transcript
                 
                 # replace if enabled, and write to output
-                self.on_replace_changed()
+                self.on_replace_changed(copy_to_clipboard=False)
                 
                 # copy to clipboard
                 self.copy_to_clipboard()

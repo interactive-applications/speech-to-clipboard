@@ -1,227 +1,77 @@
 import re
-
-
-PUNCTUATION = r"\s*[\.,\?!]\s*"
+import json
 
 
 class Replacer():
     
-    REPLACEMENTS = {
-        "• ": [
-            r"\s*bullet\s*point\s*[\.,]?\s*",
-            r"\s*aufzählungs\s*punkt\s*[\.,]?\s*",
-            r"\s*gliederungs\s*punkt\s*[\.,]?\s*",
-        ],
-        " ": [
-            r"\s*leer\s*zeichen\s*[\.,]?\s*",
-            r"\s*space\s*character\s*[\.,]?\s*",
-        ],
-        "! ": [
-            rf"{PUNCTUATION}ausrufezeichen\s*[\.,]?\s*",
-            rf"{PUNCTUATION}ausrufzeichen\s*[\.,]?\s*",
-            rf"{PUNCTUATION}rufzeichen\s*[\.,]?\s*",
-            rf"{PUNCTUATION}exclamation\s*mark\s*[\.,]?\s*",
-        ],
-        "? ": [
-            rf"{PUNCTUATION}fragezeichen\s*[\.,]?\s*",
-            rf"{PUNCTUATION}question\s*mark\s*[\.,]?\s*",
-        ],
-        "…": [
-            rf"{PUNCTUATION}punkt\s*punkt\s*punkt\s*[\.,]?\s*",
-            rf"{PUNCTUATION}dot\s*dot\s*dot\s*[\.,]?\s*",
-            rf"{PUNCTUATION}ellipsis\s*[\.,]?\s*",
-        ],
-        ". ": [
-            rf"{PUNCTUATION}period\s*[\.,]?\s*",
-            rf"{PUNCTUATION}punkt\s*[\.,]?\s*",
-            rf"{PUNCTUATION}full\s*stop\s*[\.,]?\s*",
-        ],
-        ", ": [
-            rf"{PUNCTUATION}komma\s*[\.,]?\s*",
-            rf"{PUNCTUATION}comma\s*[\.,]?\s*",
-        ],
-        " - ": [
-            r"\s*bindestrich\s*[\.,]?\s*",
-            r"\s*hyphen\s*[\.,]?\s*",
-        ],
-        "\n": [
-            r"\s*new\s*line\s*[\.,]?\s*",
-            r"\s*neue\s*zeile\s*[\.,]?\s*",
-        ],
-        "\t": [r"\s*tab\s*[\.,]?\s*",],
-        "→": [
-            r"\s*right\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*rechts\s*[\.,]?\s*",
-        ],
-        "←": [
-            r"\s*left\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*links\s*[\.,]?\s*",
-        ],
-        "↑": [
-            r"\s*up\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*oben\s*[\.,]?\s*",
-        ],
-        "↓": [
-            r"\s*down\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*unten\s*[\.,]?\s*",
-        ],
-        "↔": [
-            r"\s*double\s*arrow\s*[\.,]?\s*",
-            r"\s*left\s*right\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*links\s*rechts\s*[\.,]?\s*",
-        ],
-        "↕": [
-            r"\s*up\s*down\s*arrow\s*[\.,]?\s*",
-            r"\s*pfeil\s*nach\s*oben\s*unten\s*[\.,]?\s*",
-        ],
-        "|": [
-            r"\s*pipe\s*[\.,]?\s*",
-            r"\s*senkrechter\s*strich\s*[\.,]?\s*",
-        ],
-        "§": [
-            r"\s*paragraph\s*[\.,]?\s*",
-            r"\s*paragraph\s*symbol\s*[\.,]?\s*",
-            r"\s*paragraphen\s*symbol\s*[\.,]?\s*",
-        ],
-        "#": [
-            r"\s*hash\s*[\.,]?\s*",
-            r"\s*raute\s*[\.,]?\s*",
-        ],
-        "°": [
-            r"\s*degree\s*[\.,]?\s*",
-            r"\s*grad\s*[\.,]?\s*",
-        ],
-        "€": [r"\s*euro\s*[\.,]?\s*",],
-        "$": [r"\s*dollar\s*[\.,]?\s*",],
-        "£": [r"\s*pound\s*[\.,]?\s*",],
-        "¥": [r"\s*yen\s*[\.,]?\s*",],
-        "%": [
-            r"\s*percent\s*[\.,]?\s*",
-            r"\s*prozent\s*[\.,]?\s*",
-        ],
-        "‰": [
-            r"\s*per\s*mille\s*[\.,]?\s*",
-            r"\s*promille\s*[\.,]?\s*",
-        ],
-        "&": [
-            r"\s*ampersand\s*[\.,]?\s*",
-            r"\s*und\s*zeichen\s*[\.,]?\s*",
-        ],
-        "\n\n": [
-            r"\s*neuer\s*absatz\s*[\.,]?\s*",
-            r"\s*absatz\s*[\.,]?\s*",
-            r"\s*new\s*paragraph\s*[\.,]?\s*",
-        ],
-        "(": [
-            r"\s*linke\s*klammer\s*[\.,]?\s*",
-            r"\s*klammer\s*auf\s*[\.,]?\s*",
-            r"\s*left\s*parenthesis\s*[\.,]?\s*",
-        ],
-        ")": [
-            r"\s*rechte\s*klammer\s*[\.,]?\s*",
-            r"\s*klammer\s*zu\s*[\.,]?\s*",
-            r"\s*right\s*parenthesis\s*[\.,]?\s*",
-        ],
-        "[": [
-            r"\s*linke\s*eckige\s*klammer\s*[\.,]?\s*",
-            r"\s*eckige\s*klammer\s*auf\s*[\.,]?\s*",
-            r"\s*left\s*bracket\s*[\.,]?\s*",
-        ],
-        "]": [
-            r"\s*rechte\s*eckige\s*klammer\s*[\.,]?\s*",
-            r"\s*eckige\s*klammer\s*zu\s*[\.,]?\s*",
-            r"\s*right\s*bracket\s*[\.,]?\s*",
-        ],
-        "{": [
-            r"\s*linke\s*geschweifte\s*klammer\s*[\.,]?\s*",
-            r"\s*geschweifte\s*klammer\s*auf\s*[\.,]?\s*",
-            r"\s*linke\s*geschwungene\s*klammer\s*[\.,]?\s*",
-            r"\s*geschwungene\s*klammer\s*auf\s*[\.,]?\s*",
-            r"\s*left\s*curly\s*bracket\s*[\.,]?\s*",
-        ],
-        "}": [
-            r"\s*rechte\s*geschweifte\s*klammer\s*[\.,]?\s*",
-            r"\s*geschweifte\s*klammer\s*zu\s*[\.,]?\s*",
-            r"\s*rechte\s*geschwungene\s*klammer\s*[\.,]?\s*",
-            r"\s*geschwungene\s*klammer\s*zu\s*[\.,]?\s*",
-            r"\s*right\s*curly\s*bracket\s*[\.,]?\s*",
-        ],
-        "<": [
-            r"\s*kleiner\s*als\s*zeichen\s*[\.,]?\s*",
-            r"\s*kleiner\s*als\s*[\.,]?\s*",
-            r"\s*less\s*than\s*sign\s*[\.,]?\s*",
-            r"\s*less\s*than\s*[\.,]?\s*",
-        ],
-        ">": [
-            r"\s*größer\s*als\s*zeichen\s*[\.,]?\s*",
-            r"\s*größer\s*als\s*[\.,]?\s*",
-            r"\s*greater\s*than\s*sign\s*[\.,]?\s*",
-            r"\s*greater\s*than\s*[\.,]?\s*",
-        ],
-        "=": [
-            r"\s*ist\s*gleich\s*zeichen\s*[\.,]?\s*",
-            r"\s*ist\s*gleich\s*[\.,]?\s*",
-            r"\s*gleich\s*zeichen\s*[\.,]?\s*",
-            r"\s*equal\s*sign\s*[\.,]?\s*",
-            r"\s*equals\s*sign\s*[\.,]?\s*",
-        ],
-        "+": [
-            r"\s*plus\s*symbol\s*[\.,]?\s*",
-            r"\s*plus\s*zeichen\s*[\.,]?\s*",
-            r"\s*plus\s*sign\s*[\.,]?\s*",
-        ],
-        "-": [
-            r"\s*minus\s*symbol\s*[\.,]?\s*",
-            r"\s*minus\s*zeichen\s*[\.,]?\s*",
-            r"\s*minus\s*sign\s*[\.,]?\s*",
-        ],
-        "*": [
-            r"\s*mal\s*symbol\s*[\.,]?\s*",
-            r"\s*mal\s*zeichen\s*[\.,]?\s*",
-            r"\s*multiplication\s*sign\s*[\.,]?\s*",
-            r"\s*multiplication\s*symbol\s*[\.,]?\s*",
-            r"\s*asterisk\s*[\.,]?\s*",
-        ],
-        "/": [
-            r"\s*durch\s*symbol\s*[\.,]?\s*",
-            r"\s*durch\s*zeichen\s*[\.,]?\s*",
-            r"\s*division\s*sign\s*[\.,]?\s*",
-            r"\s*division\s*symbol\s*[\.,]?\s*",
-            r"\s*slash\s*[\.,]?\s*",
-        ],
-        "`": [
-            r"\s*back\s*tick\s*[\.,]?\s*",
-            r"\s*back\s*quote\s*[\.,]?\s*",
-        ],
-        "´": [
-            r"\s*acute\s*accent\s*[\.,]?\s*",
-            r"\s*akzent\s*akut\s*[\.,]?\s*",
-        ],
-        "'": [
-            r"\s*single\s*quote\s*[\.,]?\s*",
-            r"\s*single\s*quotation\s*mark\s*[\.,]?\s*",
-            r"\s*einfaches\s*anführungszeichen\s*[\.,]?\s*",
-            r"\s*einfaches\s*anführungszeichen\s*oben\s*[\.,]?\s*",
-            r"\s*apostroph\s*[\.,]?\s*",
-        ],
-        "\"": [
-            r"\s*double\s*quote\s*[\.,]?\s*",
-            r"\s*double\s*quotation\s*mark\s*[\.,]?\s*",
-            r"\s*double\s*quotation\s*marks\s*[\.,]?\s*",
-            r"\s*double\s*quotes\s*[\.,]?\s*",
-            r"\s*anführungsstriche\s*[\.,]?\s*",
-            r"\s*anführungszeichen\s*[\.,]?\s*",
-            r"\s*anführungsstriche\s*oben\s*[\.,]?\s*",
-            r"\s*anführungszeichen\s*oben\s*[\.,]?\s*",
-        ],
-    }
+    def __init__(self, file: str = "replacements.json") -> None:
+        self.replacements = {}
+        self.flags = re.IGNORECASE
+        try:
+            with open(file, "r", encoding="utf-8") as replacements_file:
+                content = json.load(replacements_file)
+                try:
+                    self.variables = content["variables"]
+                    self.replacements = content["replacements"]
+                    self.raw_flags = content["flags"]
+                except KeyError as e:
+                    raise KeyError(
+                        f"Replacements file '{file}' must contain 'variables', 'replacements', and 'flags' keys."
+                    ) from e
+                
+                # replace variables in variables
+                change = True
+                while change:
+                    change = False
+                    for variable, value in self.variables.items():
+                        for var, val in self.variables.items():
+                            if var is not variable:
+                                self.variables[variable] = value.replace(
+                                    var, val
+                                )
+                                if self.variables[variable] != value:
+                                    change = True
+                
+                # replace variables in replacements
+                for replacement in self.replacements:
+                    for i in range(len(self.replacements[replacement])):
+                        for variable, value in self.variables.items():
+                            self.replacements[replacement][
+                                i] = self.replacements[replacement][i].replace(
+                                    variable, value
+                                )
+                
+                # convert raw flags to re flags
+                for flag in self.raw_flags:
+                    if flag == "IGNORECASE":
+                        self.flags |= re.IGNORECASE
+                    elif flag == "DOTALL":
+                        self.flags |= re.DOTALL
+                    elif flag == "MULTILINE":
+                        self.flags |= re.MULTILINE
+                    elif flag == "VERBOSE":
+                        self.flags |= re.VERBOSE
+                    elif flag == "UNICODE":
+                        self.flags |= re.UNICODE
+                    elif flag == "LOCALE":
+                        self.flags |= re.LOCALE
+                    elif flag == "ASCII":
+                        self.flags |= re.ASCII
+                    else:
+                        raise ValueError(
+                            f"Invalid flag '{flag}' in replacements file '{file}'."
+                        )
+        
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f"Replacements file '{file}' not found."
+            ) from exc
     
-    def __init__(self):
-        pass
-    
-    def replace(self, text, replacements=None):
-        replacements = replacements or self.REPLACEMENTS
-        for replacement, regexes in replacements.items():
+    def replace(self, text: str) -> str:
+        for replacement, regexes in self.replacements.items():
             for regex in regexes:
-                text = re.sub(regex, replacement, text, flags=re.IGNORECASE)
+                text = re.sub(regex, replacement, text, flags=self.flags)
         return text
+    
+    def __str__(self) -> str:
+        return json.dumps(self.replacements, indent=4, ensure_ascii=False)
