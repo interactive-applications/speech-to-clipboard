@@ -1,17 +1,17 @@
 <h1 align="center">Whisper Clip</h1>
 
-A simple UI tool for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
+A simple UI tool written in Python, for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
 
 The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
 
 <p align="center">
-    <img src="https://img.shields.io/badge/python-3.11-blue" alt="PyPI Supported Versions">
-    <img src="https://img.shields.io/badge/license-MIT-yellow" alt="License">
-    <img src="https://img.shields.io/badge/platform-windows%20%7C%20linux%20%7C%20macos-lightgrey" alt="Supported Platforms">
+    <a href="https://github.com/clausmeister/whisper-clip"><img src="https://img.shields.io/badge/python-3.11-blue" alt="PyPI Supported Versions"></a>
+    <a href="https://github.com/clausmeister/whisper-clip"><img src="https://img.shields.io/badge/license-MIT-yellow" alt="License"></a>
+    <a href="https://github.com/clausmeister/whisper-clip"><img src="https://img.shields.io/badge/platform-windows%20%7C%20linux%20%7C%20macos-lightgrey" alt="Supported Platforms"></a>
     <a href="https://www.buymeacoffee.com/interactiveapplications"><img src="https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee" alt="Donate"></a>
 </p>
 
-<img src="resources/screenshot_01.png" alt="Screenshot" style="max-width: 400px;">
+<img src="resources/screenshot_01.png" alt="Screenshot" style="width: 400px; max-width: 400px;">
 
 Developed by [Claus Helfenschneider Interactive Applications](https://interactive-applications.com).
 
@@ -37,7 +37,7 @@ UI built with [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter).
 1. Press **REC** to start recording.
 1. Press **Stop Recording** to end the recording. The audio will be sent to the OpenAI API for transcription, and the result will be copied to your clipboard.
 
-## AutoPyToExe
+## Create Executable With AutoPyToExe
 
 To build an executable file (`.exe` on *Windows*) using [AutoPyToExe](https://github.com/brentvollebregt/auto-py-to-exe), follow these steps:
 
