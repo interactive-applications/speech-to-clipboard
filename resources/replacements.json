@@ -1,0 +1,239 @@
+{
+    "variables": {
+        "<PUNCTUATION_BEFORE>": "<WS>[\\.,\\?!]*<WS>",
+        "<PUNCTUATION_AFTER>": "<WS>[\\.,]?<WS>",
+        "<WS>": "[^\\S\\r\\n]*"
+    },
+    "flags": [
+        "IGNORECASE", "DOTALL"
+    ],
+    "replacements": {
+        "• ": [
+            "<WS>bullet<WS>point<PUNCTUATION_AFTER>",
+            "<WS>aufzählungs<WS>punkt<PUNCTUATION_AFTER>",
+            "<WS>gliederungs<WS>punkt<PUNCTUATION_AFTER>"
+        ],
+        " ": [
+            "<WS>leer<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>space<WS>character<PUNCTUATION_AFTER>"
+        ],
+        "! ": [
+            "<PUNCTUATION_BEFORE>ausrufezeichen<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>ausrufzeichen<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>rufzeichen<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>exclamation<WS>mark<PUNCTUATION_AFTER>"
+        ],
+        "? ": [
+            "<PUNCTUATION_BEFORE>fragezeichen<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>question<WS>mark<PUNCTUATION_AFTER>"
+        ],
+        "…": [
+            "<PUNCTUATION_BEFORE>punkt<WS>punkt<WS>punkt<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>dot<WS>dot<WS>dot<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>ellipsis<PUNCTUATION_AFTER>"
+        ],
+        ". ": [
+            "<PUNCTUATION_BEFORE>period<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>punkt<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>full<WS>stop<PUNCTUATION_AFTER>"
+        ],
+        ", ": [
+            "<PUNCTUATION_BEFORE>komma<PUNCTUATION_AFTER>",
+            "<PUNCTUATION_BEFORE>comma<PUNCTUATION_AFTER>"
+        ],
+        " - ": [
+            "<WS>bindestrich<PUNCTUATION_AFTER>",
+            "<WS>hyphen<PUNCTUATION_AFTER>"
+        ],
+        "–": [
+            "<WS>en<WS>dash<PUNCTUATION_AFTER>",
+            "<WS>n<ws>dash<PUNCTUATION_AFTER>"
+        ],
+        "—": [
+            "<WS>em<WS>dash<PUNCTUATION_AFTER>",
+            "<WS>m<ws>dash<PUNCTUATION_AFTER>"
+        ],
+        "\n": [
+            "<WS>new<WS>line<PUNCTUATION_AFTER>",
+            "<WS>neue<WS>zeile<PUNCTUATION_AFTER>"
+        ],
+        "\t": [
+            "<WS>tab<PUNCTUATION_AFTER>"
+        ],
+        "→": [
+            "<WS>right<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>rechts<PUNCTUATION_AFTER>"
+        ],
+        "←": [
+            "<WS>left<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>links<PUNCTUATION_AFTER>"
+        ],
+        "↑": [
+            "<WS>up<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>oben<PUNCTUATION_AFTER>"
+        ],
+        "↓": [
+            "<WS>down<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>unten<PUNCTUATION_AFTER>"
+        ],
+        "↔": [
+            "<WS>double<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>left<WS>right<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>links<WS>rechts<PUNCTUATION_AFTER>"
+        ],
+        "↕": [
+            "<WS>up<WS>down<WS>arrow<PUNCTUATION_AFTER>",
+            "<WS>pfeil<WS>nach<WS>oben<WS>unten<PUNCTUATION_AFTER>"
+        ],
+        "|": [
+            "<WS>pipe<PUNCTUATION_AFTER>",
+            "<WS>senkrechter<WS>strich<PUNCTUATION_AFTER>"
+        ],
+        "§": [
+            "<WS>paragraph<PUNCTUATION_AFTER>",
+            "<WS>paragraph<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>paragraphen<WS>symbol<PUNCTUATION_AFTER>"
+        ],
+        "#": [
+            "<WS>hash<PUNCTUATION_AFTER>",
+            "<WS>raute<PUNCTUATION_AFTER>"
+        ],
+        "°": [
+            "<WS>degree<PUNCTUATION_AFTER>",
+            "<WS>grad<PUNCTUATION_AFTER>"
+        ],
+        "€": [
+            "<WS>euro<PUNCTUATION_AFTER>"
+        ],
+        "$": [
+            "<WS>dollar<PUNCTUATION_AFTER>"
+        ],
+        "£": [
+            "<WS>pound<PUNCTUATION_AFTER>"
+        ],
+        "¥": [
+            "<WS>yen<PUNCTUATION_AFTER>"
+        ],
+        "%": [
+            "<WS>percent<PUNCTUATION_AFTER>",
+            "<WS>prozent<PUNCTUATION_AFTER>"
+        ],
+        "‰": [
+            "<WS>per<WS>mille<PUNCTUATION_AFTER>",
+            "<WS>promille<PUNCTUATION_AFTER>"
+        ],
+        "&": [
+            "<WS>ampersand<PUNCTUATION_AFTER>",
+            "<WS>und<WS>zeichen<PUNCTUATION_AFTER>"
+        ],
+        "\n\n": [
+            "<WS>neuer<WS>absatz<PUNCTUATION_AFTER>",
+            "<WS>absatz<PUNCTUATION_AFTER>",
+            "<WS>new<WS>paragraph<PUNCTUATION_AFTER>"
+        ],
+        "(": [
+            "<WS>linke<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>klammer<WS>auf<PUNCTUATION_AFTER>",
+            "<WS>left<WS>parenthesis<PUNCTUATION_AFTER>",
+            "<WS>open<WS>parenthesis<PUNCTUATION_AFTER>"
+        ],
+        ")": [
+            "<WS>rechte<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>klammer<WS>zu<PUNCTUATION_AFTER>",
+            "<WS>right<WS>parenthesis<PUNCTUATION_AFTER>",
+            "<WS>close<WS>parenthesis<PUNCTUATION_AFTER>"
+        ],
+        "[": [
+            "<WS>linke<WS>eckige<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>eckige<WS>klammer<WS>auf<PUNCTUATION_AFTER>",
+            "<WS>left<WS>bracket<PUNCTUATION_AFTER>"
+        ],
+        "]": [
+            "<WS>rechte<WS>eckige<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>eckige<WS>klammer<WS>zu<PUNCTUATION_AFTER>",
+            "<WS>right<WS>bracket<PUNCTUATION_AFTER>"
+        ],
+        "{": [
+            "<WS>linke<WS>geschweifte<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>geschweifte<WS>klammer<WS>auf<PUNCTUATION_AFTER>",
+            "<WS>linke<WS>geschwungene<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>geschwungene<WS>klammer<WS>auf<PUNCTUATION_AFTER>",
+            "<WS>left<WS>curly<WS>bracket<PUNCTUATION_AFTER>"
+        ],
+        "}": [
+            "<WS>rechte<WS>geschweifte<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>geschweifte<WS>klammer<WS>zu<PUNCTUATION_AFTER>",
+            "<WS>rechte<WS>geschwungene<WS>klammer<PUNCTUATION_AFTER>",
+            "<WS>geschwungene<WS>klammer<WS>zu<PUNCTUATION_AFTER>",
+            "<WS>right<WS>curly<WS>bracket<PUNCTUATION_AFTER>"
+        ],
+        "<": [
+            "<WS>kleiner<WS>als<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>kleiner<WS>als<PUNCTUATION_AFTER>",
+            "<WS>less<WS>than<WS>sign<PUNCTUATION_AFTER>",
+            "<WS>less<WS>than<PUNCTUATION_AFTER>"
+        ],
+        ">": [
+            "<WS>größer<WS>als<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>größer<WS>als<PUNCTUATION_AFTER>",
+            "<WS>greater<WS>than<WS>sign<PUNCTUATION_AFTER>",
+            "<WS>greater<WS>than<PUNCTUATION_AFTER>"
+        ],
+        "=": [
+            "<WS>ist<WS>gleich<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>ist<WS>gleich<PUNCTUATION_AFTER>",
+            "<WS>gleich<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>equals<WS>sign<PUNCTUATION_AFTER>",
+            "<WS>equal<WS>sign<PUNCTUATION_AFTER>"
+        ],
+        "+": [
+            "<WS>plus<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>plus<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>plus<WS>sign<PUNCTUATION_AFTER>"
+        ],
+        "-": [
+            "<WS>minus<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>minus<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>minus<WS>sign<PUNCTUATION_AFTER>"
+        ],
+        "*": [
+            "<WS>mal<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>mal<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>multiplication<WS>sign<PUNCTUATION_AFTER>",
+            "<WS>multiplication<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>asterisk<PUNCTUATION_AFTER>"
+        ],
+        "/": [
+            "<WS>durch<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>durch<WS>zeichen<PUNCTUATION_AFTER>",
+            "<WS>division<WS>sign<PUNCTUATION_AFTER>",
+            "<WS>division<WS>symbol<PUNCTUATION_AFTER>",
+            "<WS>slash<PUNCTUATION_AFTER>"
+        ],
+        "`": [
+            "<WS>back<WS>tick<PUNCTUATION_AFTER>",
+            "<WS>back<WS>quote<PUNCTUATION_AFTER>"
+        ],
+        "´": [
+            "<WS>acute<WS>accent<PUNCTUATION_AFTER>",
+            "<WS>akzent<WS>akut<PUNCTUATION_AFTER>"
+        ],
+        "'": [
+            "<WS>single<WS>quote<PUNCTUATION_AFTER>",
+            "<WS>single<WS>quotation<WS>mark<PUNCTUATION_AFTER>",
+            "<WS>einfaches<WS>anführungszeichen<PUNCTUATION_AFTER>",
+            "<WS>einfaches<WS>anführungszeichen<WS>oben<PUNCTUATION_AFTER>",
+            "<WS>apostroph<PUNCTUATION_AFTER>"
+        ],
+        "\"": [
+            "<WS>double<WS>quote<PUNCTUATION_AFTER>",
+            "<WS>double<WS>quotation<WS>marks<PUNCTUATION_AFTER>",
+            "<WS>double<WS>quotation<WS>mark<PUNCTUATION_AFTER>",
+            "<WS>double<WS>quotes<PUNCTUATION_AFTER>",
+            "<WS>anführungsstriche<PUNCTUATION_AFTER>",
+            "<WS>anführungszeichen<PUNCTUATION_AFTER>",
+            "<WS>anführungsstriche<WS>oben<PUNCTUATION_AFTER>",
+            "<WS>anführungszeichen<WS>oben<PUNCTUATION_AFTER>"
+        ]
+    }
+}
