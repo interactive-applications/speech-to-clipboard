@@ -1,6 +1,12 @@
 # Whisper Clip
 
-Simple UI tool for recording from the microphone and transferring the audio to *OpenAI*'s *Whisper* Model via OpenAI's API for automatic **transcription**. Copies the transcription to the clipboard so it can be pasted into other applications.
+Simple UI tool for **recording audio from a microphone, and automatically transcribing the recording** using *OpenAI*'s *Whisper* Model via OpenAI's API. Copies the transcription to the clipboard so it can be pasted quickly into other applications. Also supports configurable text replacements, similar to the voice recording feature on iOS, e.g. replacing the text "`new line`" with an actual new line, or "bullet point" with "`• `".
+
+By [Claus Helfenschneider Interactive Applications](https://interactive-applications.com)
+
+UI made with [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter)
+
+<img src="resources/screenshot_01.png" alt="Screenshot" width="400"/>
 
 # Installation
 
@@ -19,7 +25,7 @@ Simple UI tool for recording from the microphone and transferring the audio to *
 
 # Usage
 
-1. Select the correct microphone in the dropdown
+1. Select the microphone to record with in the dropdown
 1. Press **REC** to start recording
 1. Press **Stop recording** to stop recording. The audio will then be sent to the OpenAI API for transcription and the result will be copied to the clipboard.
 
@@ -30,7 +36,7 @@ Simple UI tool for recording from the microphone and transferring the audio to *
 1. Load the configuration file `auto-py-to-exe-config.json` (**Settings** → **Configuration** → **Import Config From JSON File**)
 1. Click **Convert .py to .exe**
 
-# Replacer
+# Text Replacer
 
 A simple naive text replacement system is implemented, which, if enabled using the **Replacer** checkbox, replaces certain expressions, e.g:
 
