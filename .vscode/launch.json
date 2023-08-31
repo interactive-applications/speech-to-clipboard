@@ -5,19 +5,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-    "name": "Whisper Clip",
+    "name": "Speech to Clipboard (UI)",
     "type": "python",
     "request": "launch",
     "cwd": "${workspaceFolder}",
-    "program": "whisper_clip.pyw",
+    "program": "speech_to_clipboard_ui.pyw",
     "console": "integratedTerminal",
     "justMyCode": true
     },
     {
-      "name": "Python: Current File",
+      "name": "Speech to Clipboard (CLI)",
       "type": "python",
       "request": "launch",
       "cwd": "${workspaceFolder}",
+      "program": "speech_to_clipboard_cli.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+      },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true

@@ -1,8 +1,4 @@
-<h1 align="center">Whisper Clip</h1>
-
-A simple UI tool written in Python, for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
-
-The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
+<h1 align="center">Speech To Clipboard</h1>
 
 <p align="center">
     <a href="https://github.com/clausmeister/whisper-clip"><img src="https://img.shields.io/badge/python-3.11-blue" alt="PyPI Supported Versions"></a>
@@ -11,11 +7,18 @@ The tool also **supports simple configurable text replacements**, similar to the
     <a href="https://www.buymeacoffee.com/interactiveapplications"><img src="https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee" alt="Donate"></a>
 </p>
 
-<img src="resources/screenshot_01.png" alt="Screenshot" style="width: 400px; max-width: 400px;">
+A tool for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
 
+It comes with a **command line interface** with different modes (interactive, verbose, silent, one-shot) as well as with a **UI**.
+
+The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
+
+Written in Python. 
 Developed by [Claus Helfenschneider Interactive Applications](https://interactive-applications.com).
 
-UI built with [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter).
+| CLI | UI |
+|--|--|
+| Verbose Mode:<br>![CLI](resources/cli_screenshot.png)<br>Silent Mode:<br>![CLI](resources/cli_screenshot_silent_mode.png) | ![UI](resources/ui_screenshot.png) |
 
 
 ## Installation
@@ -30,9 +33,13 @@ UI built with [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter).
 1. Set the environment variable `WHISPER_KEYBOARD_API_KEY` to your OpenAI API Key. You can either set it in your global environment, add it to an `.env` file or specify it in the [config.ini](resources/config.ini) file under `[openai] api_key`.
     - **Note:** An environment variable takes precedence over the value set in the config file.
 
-## Usage
+## Usage (CLI)
 
-1. Run the application: `python whisper_clip.pyw`
+1. Run the command line interface: `python speech_to_clipboard_cli.py`
+1. For available options, run `python speech_to_clipboard_cli.py --help`.
+
+## Usage (GUI)
+1. Run the UI: `python speech_to_clipboard_ui.pyw`
 1. Select your preferred microphone from the dropdown menu.
 1. Press **REC** to start recording.
 1. Press **Stop Recording** to end the recording. The audio will be sent to the OpenAI API for transcription, and the result will be copied to your clipboard.
@@ -42,7 +49,11 @@ UI built with [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter).
 To build an executable file (`.exe` on *Windows*) using [AutoPyToExe](https://github.com/brentvollebregt/auto-py-to-exe), follow these steps:
 
 1. Install the dev requirements: `pip install -r requirements-dev.in`
-1. Execute `auto-py-to-exe -c auto-py-to-exe-config.json`
+1. Depending on whether you want to build the UI or the CLI app, choose the corresponding configuration file:
+    - UI: [auto-py-to-exe-config_ui.json](auto-py-to-exe-config_ui.json)
+    - CLI: [auto-py-to-exe-config_cli.json](auto-py-to-exe-config_cli.json)
+1. There are some absolute paths in the configuration file, which have to be replaced by the path to your local project. Alternatively you can just take the config file as a reference to adjust the settings in the UI.
+1. Execute `auto-py-to-exe -c <YOUR_CONFIG_FILE>` with the adjusted config file.
 1. Load the configuration file: **Settings** → **Configuration** → **Import Config From JSON File**
 1. Click **Convert .py to .exe**
 
@@ -59,7 +70,7 @@ The tool features a simple text replacement system. When enabled via the **Repla
 
 Configure or edit the replacements in the [resources/replacements.json](resources/replacements.json) file.
 
-## Contributions
+## Contributions & Feedback
 
 Contributions and feedback are welcome! Please open an issue or submit a pull request.
 
@@ -69,7 +80,7 @@ By Claus Helfenschneider Interactive Applications @ [www.interactive-application
 
 If you enjoy this project, please consider [buying me a coffee](https://www.buymeacoffee.com/interactiveapplications), check out my [website](https://interactive-applications.com), and reach out to me. I'd love to hear from you! 
 
-**Open for hire/commissions.**
+**I am open for hire/commissions.**
 
 ## License
 
