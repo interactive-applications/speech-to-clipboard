@@ -77,8 +77,8 @@ To build an executable file (`.exe` on *Windows*) using [AutoPyToExe](https://gi
     - CLI: [auto-py-to-exe-config_cli.json](auto-py-to-exe-config_cli.json)
 1. There are some absolute paths in the configuration file, which have to be replaced by the path to your local project. Alternatively you can just take the config file as a reference to adjust the settings in the UI.
 1. Execute `auto-py-to-exe -c <YOUR_CONFIG_FILE>` with the adjusted config file.
-1. Load the configuration file: **Settings** → **Configuration** → **Import Config From JSON File**
-1. Click **Convert .py to .exe**
+1. Click **Convert .py to .exe*
+1. Note: In case you want to build UI and CLI, you need to build those separately, but after building both, you can move both excutables into the same directory, so that they use the same config file and resources, and delete the other/obsolete build directory.
 
 ## Text Replacer
 
