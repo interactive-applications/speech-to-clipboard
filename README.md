@@ -13,13 +13,12 @@ It comes with a **command line interface** with different modes (interactive, ve
 
 The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
 
-| CLI | UI |
-|-----|----|
-| ![CLI](resources/cli_screenshot.png) | ![UI](resources/ui_screenshot.png) |
-
-
 Written in Python. 
 Developed by [Claus Helfenschneider Interactive Applications](https://interactive-applications.com).
+
+| CLI | UI |
+|--|--|
+| Verbose Mode:<br>![CLI](resources/cli_screenshot.png)<br>Silent Mode:<br>![CLI](resources/cli_screenshot_silent_mode.png) | ![UI](resources/ui_screenshot.png) |
 
 
 ## Installation
@@ -53,7 +52,7 @@ To build an executable file (`.exe` on *Windows*) using [AutoPyToExe](https://gi
 1. Depending on whether you want to build the UI or the CLI app, choose the corresponding configuration file:
     - UI: [auto-py-to-exe-config_ui.json](auto-py-to-exe-config_ui.json)
     - CLI: [auto-py-to-exe-config_cli.json](auto-py-to-exe-config_cli.json)
-1. There are some absolute paths in the configuration file, which have to be replaced by the path to your local project, or just take the config file as a reference to adjust the settings in the UI.
+1. There are some absolute paths in the configuration file, which have to be replaced by the path to your local project. Alternatively you can just take the config file as a reference to adjust the settings in the UI.
 1. Execute `auto-py-to-exe -c <YOUR_CONFIG_FILE>` with the adjusted config file.
 1. Load the configuration file: **Settings** → **Configuration** → **Import Config From JSON File**
 1. Click **Convert .py to .exe**
@@ -71,7 +70,7 @@ The tool features a simple text replacement system. When enabled via the **Repla
 
 Configure or edit the replacements in the [resources/replacements.json](resources/replacements.json) file.
 
-## Contributions
+## Contributions & Feedback
 
 Contributions and feedback are welcome! Please open an issue or submit a pull request.
 
