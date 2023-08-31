@@ -18,7 +18,7 @@ Developed by [Claus Helfenschneider Interactive Applications](https://interactiv
 
 | CLI | UI |
 |--|--|
-| Verbose Mode:<br>![CLI](resources/cli_screenshot.png)<br>Silent Mode:<br>![CLI](resources/cli_screenshot_silent_mode.png) | ![UI](resources/ui_screenshot.png) |
+| Verbose Mode:<br>![CLI](documentation/cli_screenshot.png)<br>Silent Mode:<br>![CLI](documentation/cli_screenshot_silent_mode.png) | ![UI](documentation/ui_screenshot.png) |
 
 
 ## Installation
