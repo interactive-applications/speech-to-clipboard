@@ -26,5 +26,6 @@ RUN pip install --no-cache-dir -r requirements.in
 # copy project
 COPY . .
 
-# run whisper_clip.pyw
+# run 
+# NOTE: docker support is incomplete and may not work
 CMD ["python", "speech_to_clipboard_cli.py"]
