@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/speech_to_clipboard_ui.pyw"
+   "value": "P:/_DEV/PYTHON_PROJECTS/speech-to-clipboard/speech_to_clipboard_ui.pyw"
   },
   {
    "optionDest": "onefile",
@@ -19,7 +19,7 @@
   },
   {
    "optionDest": "icon_file",
-   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/resources/icon.ico"
+   "value": "P:/_DEV/PYTHON_PROJECTS/speech-to-clipboard/resources/icon.ico"
   },
   {
    "optionDest": "ascii",
@@ -71,11 +71,11 @@
   },
   {
    "optionDest": "datas",
-   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/resources;resources/"
+   "value": "P:/_DEV/PYTHON_PROJECTS/speech-to-clipboard/resources;resources/"
   },
   {
    "optionDest": "datas",
-   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/.venv/Lib/site-packages/customtkinter;customtkinter/"
+   "value": "P:/_DEV/PYTHON_PROJECTS/speech-to-clipboard/.venv/Lib/site-packages/customtkinter;customtkinter/"
   }
  ],
  "nonPyinstallerOptions": {
