@@ -7,7 +7,7 @@
   },
   {
    "optionDest": "filenames",
-   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/whisper_clip.pyw"
+   "value": "P:/_DEV/PYTHON_PROJECTS/whisper-keyboard/speech_to_clipboard_cli.py"
   },
   {
    "optionDest": "onefile",
@@ -15,7 +15,7 @@
   },
   {
    "optionDest": "console",
-   "value": false
+   "value": true
   },
   {
    "optionDest": "icon_file",
