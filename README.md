@@ -9,7 +9,7 @@
 
 A tool for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
 
-It comes with a **command line interface** with different modes (interactive, verbose, silent, one-shot) as well as with a **UI**.
+It comes with a **command line interface** with different modes (interactive, verbose, silent, one-shot) as well as with a **UI**. It can also be used as a **module** in other Python projects.
 
 The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
 
@@ -33,16 +33,39 @@ Developed by [Claus Helfenschneider Interactive Applications](https://interactiv
 1. Set the environment variable `WHISPER_KEYBOARD_API_KEY` to your OpenAI API Key. You can either set it in your global environment, add it to an `.env` file or specify it in the [config.ini](resources/config.ini) file under `[openai] api_key`.
     - **Note:** An environment variable takes precedence over the value set in the config file.
 
-## Usage (CLI)
+## Usage
+
+### CLI (Command Line Interface)
 
 1. Run the command line interface: `python speech_to_clipboard_cli.py`
 1. For available options, run `python speech_to_clipboard_cli.py --help`.
 
-## Usage (GUI)
+### UI (User Interface)
 1. Run the UI: `python speech_to_clipboard_ui.pyw`
 1. Select your preferred microphone from the dropdown menu.
 1. Press **REC** to start recording.
 1. Press **Stop Recording** to end the recording. The audio will be sent to the OpenAI API for transcription, and the result will be copied to your clipboard.
+
+### Python Module
+
+```python
+from settings import Settings
+from core.speech_to_clipboard import SpeechToClipboard
+
+speech_to_clip = SpeechToClipboard(
+    audio_file_path=Settings.AUDIO_FILE_PATH,
+    config_file_path=Settings.CONFIG_FILE_PATH,
+    replacemetns_file_path=Settings.REPLACEMENTS_FILE_PATH,
+    openai_api_key_env_var=Settings.OPENAI_API_KEY_ENV_VAR,
+)
+
+speech_to_clip.start_recording()
+print("Recording...")
+input("Press Enter to stop recording...")
+speech_to_clip.stop_and_save_recording()
+transcription = speech_to_clip.transcribe_recording()
+print(transcription)
+```
 
 ## Create Executable With AutoPyToExe
 
