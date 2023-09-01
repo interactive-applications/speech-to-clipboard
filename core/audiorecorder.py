@@ -185,6 +185,16 @@ class AudioRecorder:
         """
         if os.path.exists(self.wav_file):
             os.remove(self.wav_file)
+        alt_file = self.get_alt_file()
+        if os.path.exists(alt_file):
+            os.remove(alt_file)
+    
+    def get_alt_file(self, file_format: str = "mp3") -> str:
+        """
+        Get the path to the mp3 file.
+        """
+        basename = os.path.splitext(self.wav_file)[0]
+        return f"{basename}.{file_format}"
     
     def save_audio(self) -> float:
         """
@@ -200,12 +210,31 @@ class AudioRecorder:
         audio = AudioSegment.from_wav(self.wav_file)
         
         # trim silence from start and end
+        
         trimmed_audio: AudioSegment = self.strip_silence(audio)
         
         # get the length of the resulting file in seconds
         duration = trimmed_audio.duration_seconds
         
         # save the trimmed audio file
-        trimmed_audio.export(self.wav_file, format='wav')
+        try:
+            alt_format = "mp3"
+            # save the trimmed audio file as mp3
+            alt_path = self.get_alt_file(alt_format)
+            
+            trimmed_audio.export(
+                alt_path,
+                format=alt_format,
+                bitrate="64k",
+                parameters=["-ac", "1", "-ar", "16000"]
+            )
+            
+            # delete the original WAV file
+            if os.path.exists(self.wav_file):
+                os.remove(self.wav_file)
+        
+        except Exception: #pylint: disable=broad-except
+            # save as WAV if mp3 fails
+            trimmed_audio.export(self.wav_file, format='wav')
         
         return duration
