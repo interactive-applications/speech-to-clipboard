@@ -43,7 +43,21 @@ class SpeechToClipboard:
             f"Using OpenAI API Key: {openai_api_key[:3]}...{openai_api_key[-4:]}"
         )
         
-        self.transcriber = Transcriber(openai_api_key=openai_api_key)
+        # load transcriber settings
+        use_local = self.config.getboolean(
+            'openai', 'use_local_model', fallback=True
+        )
+        use_api = self.config.getboolean('openai', 'use_api', fallback=True)
+        whisper_model = self.config.get(
+            'openai', 'local_whisper_model', fallback='base'
+        )
+        
+        self.transcriber = Transcriber(
+            openai_api_key=openai_api_key,
+            use_local=use_local,
+            use_api=use_api,
+            whisper_model=whisper_model
+        )
         self.replacer = Replacer(self.replacements_file_path)
     
     def ensure_config_file(self) -> None:

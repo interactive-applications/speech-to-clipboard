@@ -7,14 +7,26 @@
     <a href="https://www.buymeacoffee.com/interactiveapplications"><img src="https://img.shields.io/badge/-buy_me_a%C2%A0coffee-gray?logo=buy-me-a-coffee" alt="Donate"></a>
 </p>
 
-A tool for **recording audio from a microphone and automatically transcribing the recording** using OpenAI's *Whisper* model via OpenAI's API. The **transcription is copied to the clipboard** for easy pasting into other applications. 
+A tool for recording audio from a microphone, transcribing the recording, and copying the transcription to the clipboard.
 
-It comes with a **command line interface** with different modes (interactive, verbose, silent, one-shot) as well as with a **UI**. It can also be used as a **module** in other Python projects.
-
-The tool also **supports simple configurable text replacements**, similar to the voice recording feature on iOS. For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
-
-Written in Python. 
 Developed by [Claus Helfenschneider Interactive Applications](https://interactive-applications.com).
+
+## Features
+
+- The **transcription is copied to the clipboard** for easy pasting into other applications. 
+- Comes with a **CLI**, a **UI**, and is usable as a **python module**.
+- Supports configurable **text replacements**, similar to the voice recording feature on iOS.<br> For example, it can replace the text "new line" with an actual new line or "bullet point" with "`• `".
+- If **ffmpeg** is installed (optional), the audio will be converted to mp3 prior to transcription, for faster uploads when using the OpenAI API.
+- Configurable via a **config file** ([config.ini](resources/config.ini)), **command line arguments** (CLI), and replacements-mapping file ([replacements.json](resources/replacements.json)).
+
+## Transcription backend
+
+Either one or both of the following transcription backends are supported and can be used:
+
+- **Local whisper model**. For this, [`openai-whisper`](https://github.com/openai/whisper) must be installed.
+- OpenAI's Whisper model via the [**OpenAI API**](https://platform.openai.com/docs/guides/speech-to-text). For this, an **OpenAI API key** is required.
+
+## Screenshots
 
 | CLI | UI |
 |--|--|
